@@ -6,7 +6,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 
 class CustomUser(AbstractUser):
-    # ⚠️ pas besoin de redéfinir username, first_name, last_name, date_joined
+
 
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     is_authorized = models.BooleanField(default=False)
@@ -26,6 +26,8 @@ class PasswordResetRequest(models.Model):
     email = models.EmailField()
     token = models.CharField(max_length=32, default=get_random_string, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
     # Token valide 1 heure
     TOKEN_VALIDITY_PERIOD = timezone.timedelta(hours=1)
