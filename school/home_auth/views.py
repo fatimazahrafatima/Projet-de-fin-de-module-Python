@@ -16,17 +16,19 @@ def forgot_password_view(request):
 # SIGNUP
 # -------------------------
 def signup_view(request):
-    if request.method == 'POS                                                                                                           T':
+    if request.method == 'POST':
+                                                                                                                   
         first_name = request.POST.get('first_name')
         last_name  = request.POST.get('last_name')
         email      = request.POST.get('email')
         password   = request.POST.get('password')
+        Confirm_Password = request.POST.get('confirm_password')
         role       = request.POST.get('role')
 
         # Vérification rôle
-        if role not in ['student', 'teacher', 'admin']:
-            messages.error(request, "Invalid role selected")
-            return redirect('register')
+        if password != Confirm_Password:
+            messages.error(request, "you used tow difrent passwords")
+            return redirect('signup')
 
         # Création utilisateur
         user = CustomUser.objects.create_user(
@@ -48,8 +50,8 @@ def signup_view(request):
         messages.success(request, 'Signup successful!')
 
         return redirect('index')
-
-    return render(request, 'authentication/register.html')
+    else:
+     return render(request, 'authentication/register.html')
 
 
 # -------------------------
@@ -57,14 +59,14 @@ def signup_view(request):
 # -------------------------
 def login_view(request):
     if request.method == 'POST':
-        email    = request.POST.get('email')
-        password = request.POST.get('password')
+        email    = request.POST['email']
+        password = request.POST['password']
 
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
             login(request, user)
-            messages.success(request, 'Login successful!')
+            
 
             # Redirection selon rôle
             if user.is_admin:
@@ -72,7 +74,7 @@ def login_view(request):
             elif user.is_teacher:
                 return redirect('index')
             elif user.is_student:
-                return redirect('index')
+                return redirect('signup')
             else:
                 messages.error(request, 'Invalid user role')
                 return redirect('login')
