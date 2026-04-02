@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 urlpatterns = [
- path('admin/', admin.site.urls),
+ path('admin/', admin.site.urls, name='/admin/'),
  path('', include('faculty.urls')),
  path('student/', include('student.urls')),
  path('authentication/', include('home_auth.urls')), #  ajout  de lien vers les URLs de home_auth :

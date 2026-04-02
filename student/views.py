@@ -2,7 +2,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Student, Parent
-
+def student_dashboard(request):
+ return render(request, 'students/student-dashboard.html')
 def student_list(request):
  return render(request, 'students/students.html')
 def edit_student(request, student_id):

@@ -8,6 +8,7 @@ def subject_list(request):
     return render(request, 'subjects/subject_list.html',
                   {'subjects': subjects})
 
+
 def add_subject(request):
     departments = Department.objects.all()
     if request.method == 'POST':

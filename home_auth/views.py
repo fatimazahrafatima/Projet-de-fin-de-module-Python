@@ -29,27 +29,31 @@ def signup_view(request):
         if password != Confirm_Password:
             messages.error(request, "you used tow difrent passwords")
             return redirect('signup')
+        elif CustomUser.objects.filter(email=email).exists():
+            messages.info(request, 'email alredy existe')
+            return redirect('signup')
+        else:
 
         # Création utilisateur
-        user = CustomUser.objects.create_user(
-            username=email,
-            email=email,
-            first_name=first_name,
-            last_name=last_name,
-            password=password,
-        )
+            user = CustomUser.objects.create_user(
+              username=email,
+              email=email,
+              first_name=first_name,
+              last_name=last_name,
+              password=password,
+            )
 
         # Attribution des rôles
-        user.is_student = (role == 'student')
-        user.is_teacher = (role == 'teacher')
-        user.is_admin   = (role == 'admin')
+            user.is_student = (role == 'student')
+            user.is_teacher = (role == 'teacher')
+            
 
-        user.save()
+            user.save()
 
-        login(request, user)
-        messages.success(request, 'Signup successful!')
+            login(request, user)
+            messages.success(request, 'Signup successful!')
 
-        return redirect('index')
+            return redirect('login')
     else:
      return render(request, 'authentication/register.html')
 
@@ -69,12 +73,12 @@ def login_view(request):
             
 
             # Redirection selon rôle
-            if user.is_admin:
-                return redirect('index')
+            if user.is_superuser :
+                return redirect('/admin/')
             elif user.is_teacher:
-                return redirect('index')
+                return redirect('add_student')
             elif user.is_student:
-                return redirect('signup')
+                return redirect('student_dashboard')
             else:
                 messages.error(request, 'Invalid user role')
                 return redirect('login')

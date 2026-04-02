@@ -11,7 +11,6 @@ class CustomUser(AbstractUser):
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     is_authorized = models.BooleanField(default=False)
     login_token = models.CharField(max_length=6, blank=True, null=True)
-
     # Roles
     is_student = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
