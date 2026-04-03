@@ -1,4 +1,59 @@
 from django.db import models
+from subject.models import Subject
+
+class ExamResult(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('passed', 'Passed'),
+        ('failed', 'Failed'),
+    ]
+
+    student = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        related_name='exam_results'
+    )
+
+    exam = models.ForeignKey(
+        'Exam',
+        on_delete=models.CASCADE,
+        related_name='results'
+    )
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    grade = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Grade in percentage or marks"
+    )
+
+    class Meta:
+        unique_together = ['student', 'exam']  # Prevent duplicate result for same student & exam
+
+    def __str__(self):
+        return f"{self.student} - {self.exam} : {self.status}"
+class Exam(models.Model):
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE)
+
+    title = models.CharField(max_length=100 )
+    exam_type = models.CharField(max_length=10,choices=[('Midterm', 'Midterm'), ('Final', 'Final'),('quiz', 'quiz')],
+        default='quiz')
+    
+    exam_date = models.DateTimeField()
+
+    duration = models.DurationField(help_text="exam duration")
+
+    total_marks = models.PositiveIntegerField(default=20)
+
+    def __str__(self):
+        return f"{self.title} - {self.subject.name}"
 
 class Parent(models.Model):
     father_name = models.CharField(max_length=100)
@@ -23,7 +78,7 @@ class Student(models.Model):
     gender = models.CharField(max_length=10,
         choices=[('Male', 'Male'), ('Female', 'Female')])
     date_of_birth = models.DateField()
-    student_class = models.CharField(max_length=50)
+    student_class = models.ManyToManyField(Subject)
     joining_date = models.DateField()
     mobile_number = models.CharField(max_length=15)
     admission_number = models.CharField(max_length=20)
