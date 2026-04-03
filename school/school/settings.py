@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'faculty', 
-    'student',  #Ajout de student 
-    'home_auth', #Ajout de home_auth
+    'student',  
+    'home_auth', 
     'department',
     'subject',
     'teacher',

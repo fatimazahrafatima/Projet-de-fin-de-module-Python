@@ -1,9 +1,88 @@
 # student/views.py
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Student, Parent
+from .models import Student, Parent ,ExamResult,Exam,Holiday
+from datetime import datetime, timedelta
+import calendar
 def student_dashboard(request):
- return render(request, 'students/student-dashboard.html')
+    # Get logged-in student (adjust if needed)
+    student = Student.objects.first()   # ⚠️ change later to request.user
+
+    # 📚 Courses
+    enrolled_courses = student.student_class.count()
+    total_courses = 6
+
+    # 📝 Exams
+    results = ExamResult.objects.filter(student=student)
+
+    total_tests = results.count()
+    tests_attended = results.exclude(status='pending').count()
+    tests_passed = results.filter(status='passed').count()
+
+    # 📊 Average grade
+    grades = results.exclude(grade=None)
+    if grades.exists():
+        average_grade = round(sum([r.grade for r in grades]) / grades.count(), 2)
+    else:
+        average_grade = 0
+
+    # 📅 Learning history (you can improve later)
+    learning_history = results.select_related('exam').order_by('-exam__exam_date')[:5]
+  
+    today = datetime.today()
+    year = today.year
+    month = today.month
+
+    # Exams and holidays
+    exams = Exam.objects.filter(exam_date__year=year, exam_date__month=month)
+    exam_days = {e.exam_date.day: e for e in exams}
+
+    holidays = Holiday.objects.filter(
+        date_start__lte=datetime(year, month, calendar.monthrange(year, month)[1]),
+        date_end__gte=datetime(year, month, 1)
+    )
+
+    # Build calendar days
+    cal = calendar.Calendar()
+    days = []
+    for day in cal.itermonthdays(year, month):
+        if day == 0:
+            days.append({'day': 0})
+            continue
+
+        date_obj = datetime(year, month, day)
+        is_weekend = date_obj.weekday() >= 5
+        holiday = next((h for h in holidays if h.date_start <= date_obj.date() <= h.date_end), None)
+        exam = exam_days.get(day)
+
+        days.append({
+            'day': day,
+            'is_weekend': is_weekend,
+            'holiday': holiday,
+            'exam': exam
+        })
+
+    # Split days into weeks (lists of 7)
+    weeks = [days[i:i+7] for i in range(0, len(days), 7)]
+
+
+    context = {
+        'student': student,
+        'enrolled_courses': enrolled_courses,
+        'total_courses': total_courses,
+        'total_tests': total_tests,
+        'tests_attended': tests_attended,
+        'tests_passed': tests_passed,
+        'average_grade': average_grade,
+        'learning_history': learning_history,
+        'weeks': weeks,
+        'month_name': calendar.month_name[month],
+        'year': year
+    }
+
+
+
+    return render(request, 'students/student-dashboard.html', context)
 def student_list(request):
  return render(request, 'students/students.html')
 def edit_student(request, student_id):

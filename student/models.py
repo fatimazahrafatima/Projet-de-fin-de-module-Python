@@ -88,3 +88,11 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.student_id})"
+class Holiday(models.Model):
+    name = models.CharField(max_length=100)
+    date_start = models.DateField()
+    date_end = models.DateField()
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
