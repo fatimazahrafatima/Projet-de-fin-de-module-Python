@@ -1,0 +1,498 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+   
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+      <title>Preskool - Dashboard</title>
+      <link rel="shortcut icon" href="{%static 'assets/img/favicon.png' %}">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,600;0,700;1,400&amp;display=swap">
+      <link rel="stylesheet" href="{%static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{%static 'assets/plugins/fontawesome/css/fontawesome.min.css' %}">
+      <link rel="stylesheet" href="{%static 'assets/plugins/fontawesome/css/all.min.css' %}">
+      <link rel="stylesheet" href="{%static 'assets/css/style.css' %}">
+      <style>
+        .header-left {
+            min-width: 250px;
+        }
+        .exam-day {
+         background-color: #dc3545;
+         color: white;
+         font-weight: bold;
+        }
+
+        .holiday-day {
+         background-color: #007bff;
+         color: white;
+         font-weight: bold;
+        }
+
+        .weekend-day {
+         background-color: #838383;
+         color: black;
+        }
+       .calendar-table td {
+         height: 50px;
+         width: 50px;
+         vertical-align: middle;
+        }
+        
+       .tooltip-text {
+    visibility: hidden;
+    width: 180px;
+    background-color: #47e100;
+    color: #fff;
+    text-align: left;
+    padding: 5px 10px;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 10;
+    bottom: 110%; /* show above the cell */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 13px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Arrow at the bottom */
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* bottom of tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+.calendar-table td {
+    position: relative;  /* VERY IMPORTANT */
+}
+/* Show tooltip on hover */
+.calendar-table td:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+      </style>
+    </head>
+   <body>
+      <div class="main-wrapper">
+         <div class="header">
+            <div class="header-left">
+                <div class="user-header">
+                   <div class="avatar avatar-sm">
+                    {% if Teacher.teacher_image %}
+                    <img src="{{ Teacher.teacher_image.url }}" alt="User Image" class="avatar-img rounded-circle">
+                    {% else %}
+                    <img src="{% static 'assets/img/profiles/avatar-01.jpg' %}"alt="User Image" class="avatar-img rounded-circle">
+                    {% endif %}
+                   </div>
+                   <div class="user-text">
+                      <p class="text-muted mb-0">{{ Teacher.first_name }} {{ Teacher.last_name }}</p>
+                   </div>
+                </div>
+       
+                <div class="submenu">
+                   <a href="{% url 'logout' %}">Logout</a>
+                </div>
+             </div>
+            <a href="javascript:void(0);" id="toggle_btn">
+            <i class="fas fa-align-left"></i>
+            </a>
+            <div class="top-nav-search">
+               <form>
+                  <input type="text" class="form-control" placeholder="Search here">
+                  <button class="btn" type="submit"><i class="fas fa-search"></i></button>
+               </form>
+            </div>
+            <a class="mobile_btn" id="mobile_btn">
+            <i class="fas fa-bars"></i>
+            </a>
+            <ul class="nav user-menu">
+               <li class="nav-item dropdown noti-dropdown">
+                  <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                   {% comment %} {% if unread_notification_count > 0 %}
+                  <i class="far fa-bell"></i> <span class="badge badge-pill">{{unread_notification_count}}</span>
+                  {% endif %} {% endcomment %}
+                  </a>
+                  <div class="dropdown-menu notifications">
+                     <div class="topnav-dropdown-header">
+                        <span class="notification-title">Notifications</span>
+                        <a href="javascript:void(0)" class="clear-noti"> Clear All </a>
+                     </div>
+                     <div class="noti-content">
+                        <ul class="notification-list">
+                           
+                        </ul>
+                     </div>
+                     <div class="topnav-dropdown-footer">
+                        <a href="#">View all Notifications</a>
+                     </div>
+                  </div>
+               </li>
+            </ul>
+         </div>
+         <div class="sidebar" id="sidebar">
+            <div class="sidebar-inner slimscroll">
+               <div id="sidebar-menu" class="sidebar-menu">
+                  <ul>
+                     <li class="menu-title">
+                        <span>Main Menu</span>
+                     </li>
+                     <li class="submenu active">
+                        <a href="{% url 'teacher_dashboard'%}">
+                           <i class="fas fa-user-graduate"></i> Dashboard
+                        </a>
+                     </li>
+      
+                     <li >
+                        <a href="{% url 'students_teacher'%}"><i class="fas fa-user-graduate"></i> <span> Students</span> </a>
+                     </li>
+                     <li >
+                        <a href="{% url 'courses_teacher'%}"><i class="fas fa-book-reader"></i> <span> Courses</span> </a>
+
+                     </li>
+                     <li>
+                        <a href="{% url 'holidays_teacher'%}"><i class="fas fa-holly-berry"></i> <span>Holidays</span></a>
+                     </li>
+                     <li>
+                        <a href="{% url 'exams_teacher'%}"><i class="fas fa-clipboard-list"></i> <span>Exam list</span></a>
+                     </li>
+
+                  </ul>>
+               </div>
+            </div>
+         </div>
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h4>Bienvenue Prof. {{ Teacher.first_name }} !</h4>
+      <p class="text-muted">Dashboard / Teacher Dashboard</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <span class="text-muted">{{ today|date:"l d F Y" }}</span>
+    </div>
+  </div>
+  <div class="row">
+  <div class="col-xl-3 col-sm-6 col-12 d-flex">
+    <div class="card bg-six w-100">
+    <div class="card-body">
+    <div class="db-widgets d-flex justify-content-between align-items-center">
+    <div class="db-icon">
+    <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="db-info">
+        <h3>{{ students.count }}</h3>
+    <h6>my students</h6>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+        <div class="col-xl-3 col-sm-6 col-12 d-flex">
+        <div class="card bg-nine w-100">
+        <div class="card-body">
+        <div class="db-widgets d-flex justify-content-between align-items-center">
+        <div class="db-icon">
+        <i class="fas fa-book-open"></i>
+        </div>
+        <div class="db-info">
+            <h3>{{ subjects.count }}</h3>
+        <h6>my Courses</h6>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12 d-flex">
+            <div class="card bg-ten w-100">
+            <div class="card-body">
+            <div class="db-widgets d-flex justify-content-between align-items-center">
+            <div class="db-icon">
+            <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="db-info">
+                <h3>{{ upcoming_exams.count }}</h3>
+            <h6>upcoming_exams</h6>
+            </div>
+            </div>
+            </div>
+            </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card bg-nine w-100">
+                <div class="card-body">
+                <div class="db-widgets d-flex justify-content-between align-items-center">
+                <div class="db-icon">
+                <i class="fas fa-book-open"></i>
+                </div>
+                <div class="db-info">
+                    <h3>{{ papers_To_Grade.count }}</h3>
+                <h6>exams To Grade</h6>
+                </div>
+                </div>
+                </div>
+                </div>
+                </div>
+            </div>
+  <!-- Stats cards -->
+
+
+  <div class="row">
+
+    <!-- Colonne gauche -->
+    <div class="col-md-7">
+
+      <!-- Mes etudiants -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h6 class="card-title">Mes etudiants recents</h6>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Nom</th>
+                <th>Matiere</th>
+                <th>Note</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr>
+                <td>
+                  {% if student.student_image %}
+                    <img src="{{ student.student_image.url }}"
+                         width="35" height="35"
+                         style="border-radius:50%; object-fit:cover;">
+                  {% else %}
+                    <div style="width:35px;height:35px;border-radius:50%;
+                                background:#E6F1FB;display:flex;
+                                align-items:center;justify-content:center;
+                                font-weight:500;color:#185FA5;font-size:12px;">
+                      {{ student.first_name|first }}{{ student.last_name|first }}
+                    </div>
+                  {% endif %}
+                </td>
+                <td>{{ student.first_name }} {{ student.last_name }}</td>
+                <td>{{ student.student_class }}</td>
+                <td>-</td>
+                <td><span class="badge bg-success">Actif</span></td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted">
+                  Aucun etudiant
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Performance par matiere -->
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">Performance par matiere</h6>
+          {% for subject in subjects %}
+          <div class="mb-3">
+            <div class="d-flex justify-content-between">
+              <span style="font-size:13px;">{{ subject.name }}</span>
+              <span style="font-size:13px; font-weight:500;">{{ subject.code }}</span>
+            </div>
+            <div class="progress mt-1" style="height:5px;">
+              <div class="progress-bar" style="width:70%;"></div>
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-muted">Aucune matiere</p>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="col-md-5">
+
+<div class="col-xl-8 d-flex">
+    <div class="card flex-fill">
+        <div class="card-header">
+            <h5 class="card-title">{{month_name}}  <span style="font-size: 25px;"><strong>   {{year}}</strong></span></h5>
+        </div>
+        <div class="calendar-container">
+            <table class="calendar-table table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th>
+                        <th>Fri</th><th>Sat</th><th>Sun</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in weeks %}
+                    <tr>
+                        {% for day in week %}
+                            {% if day.day == 0 %}
+                                <td></td>
+                            {% elif day.exam %}
+                            <td class="exam-day" >
+                                {{ day.day }}   
+                                <div class="tooltip-text">
+                                    {{ day.exam.exam_type }} : {{ day.exam.subject.name }}
+                                </div>
+                            </td>
+                            {% elif day.is_weekend %}
+                                <td class="weekend-day">{{ day.day }}</td>
+                                
+                            {% elif day.holiday %}
+                                <td class="holiday-day" >    
+                                    <div class="tooltip-text">
+                                        holiday : {{ day.holiday.name }}
+                                   </div>{{ day.day }}</td>
+                            {% else %}
+                                <td>{{ day.day }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+      <!-- Prochains examens -->
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">Prochains examens</h6>
+          {% for exam in upcoming_exams %}
+          <div class="d-flex align-items-center gap-2 py-2 border-bottom">
+            <div style="width:36px;height:36px;border-radius:8px;
+                        background:#FAEEDA;display:flex;
+                        align-items:center;justify-content:center;">
+              <i class="fas fa-file-alt" style="color:#854F0B;"></i>
+            </div>
+            <div class="flex-grow-1">
+              <p style="font-size:13px;font-weight:500;margin:0;">
+                {{ exam.exam_name }}
+              </p>
+              <p style="font-size:11px;color:#999;margin:0;">
+                {{ exam.exam_date|date:"d/m/Y" }}
+              </p>
+            </div>
+            <span class="badge" style="background:#FAEEDA;color:#854F0B;">
+              {{ exam.subject }}
+            </span>
+          </div>
+          {% empty %}
+          <p class="text-muted text-center py-2">Aucun examen planifie</p>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <footer>
+    <p>Copyright © 2020 Dreamguys.</p>
+    </footer>
+</div>
+
+    
+    </div>
+    
+    </div>
+    
+    </div>
+    <script src="{%static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    
+    <script src="{%static 'assets/js/popper.min.js' %}"></script>
+    <script src="{%static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+    
+    <script src="{%static 'assets/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+    
+    <script src="{%static 'assets/plugins/apexchart/apexcharts.min.js' %}"></script>
+    <script src="{%static 'assets/plugins/apexchart/chart-data.js' %}"></script>
+    
+    <script src="{%static 'assets/plugins/simple-calendar/jquery.simple-calendar.js' %}"></script>
+    <script src="{%static 'assets/js/calander.js' %}"></script>
+    
+    <script src="{%static 'assets/js/circle-progress.min.js' %}"></script>
+    
+    <script src="{%static 'assets/js/script.js' %}"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select the notification dropdown element
+            const notiDropdown = document.querySelector('.noti-dropdown');
+            const clearAllBtn = document.querySelector('.clear-noti');
+    
+            if (notiDropdown) {
+                // Add a click event listener to the notification dropdown
+                notiDropdown.addEventListener('click', function() {
+                    const url = "";
+    
+                    // Use the Fetch API to send a POST request to mark notifications as read
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        }
+                    })
+                    .then(response => response.json())  // Parse the JSON response
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Remove the badge if notifications are successfully marked as read
+                            const badge = document.querySelector('.badge');
+                            if (badge) {
+                                badge.remove();
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);  // Log any errors
+                    });
+                });
+            }
+    
+            if (clearAllBtn) {
+                // Add a click event listener to the "Clear All" button
+                clearAllBtn.addEventListener('click', function() {
+                    const clearUrl = "";  // Ensure this URL points to the correct view
+    
+                    // Use Fetch to send a POST request to clear all notifications
+                    fetch(clearUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        }
+                    })
+                    .then(response => response.json())  // Parse the JSON response
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Clear all notifications from the dropdown
+                            const notificationList = document.querySelector('.notification-list');
+                            if (notificationList) {
+                                notificationList.innerHTML = '<li>No new notifications</li>';  // Optionally show a "No new notifications" message
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);  // Log any errors
+                    });
+                });
+            }
+        });
+    </script>
+    </body>
+    
+    </html>
+    
+    

@@ -1,0 +1,288 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+   
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+      <title>Preskool - Dashboard</title>
+      <link rel="shortcut icon" href="{%static 'assets/img/favicon.png' %}">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,600;0,700;1,400&amp;display=swap">
+      <link rel="stylesheet" href="{%static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{%static 'assets/plugins/fontawesome/css/fontawesome.min.css' %}">
+      <link rel="stylesheet" href="{%static 'assets/plugins/fontawesome/css/all.min.css' %}">
+      <link rel="stylesheet" href="{%static 'assets/css/style.css' %}">
+      <style>
+        .header-left {
+            min-width: 250px;
+        }
+        .exam-card {
+            transition: 0.3s;
+            border-left: 5px solid #007bff;
+        }
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .badge-midterm { background-color: #ffc107; }
+        .badge-final { background-color: #dc3545; }
+        .badge-quiz { background-color: #28a745; }
+</style>
+    </head>
+   <body>
+      <div class="main-wrapper">
+         <div class="header">
+            <div class="header-left">
+                <div class="user-header">
+                   <div class="avatar avatar-sm">
+                    {% if Teacher.teacher_image %}
+                    <img src="{{ Teacher.teacher_image.url }}" alt="User Image" class="avatar-img rounded-circle">
+                    {% else %}
+                    <img src="{% static 'assets/img/profiles/avatar-01.jpg' %}"alt="User Image" class="avatar-img rounded-circle">
+                    {% endif %}
+                   </div>
+                   <div class="user-text">
+                      <p class="text-muted mb-0">{{ Teacher.first_name }} {{ Teacher.last_name }}</p>
+                   </div>
+                </div>
+       
+                <div class="submenu">
+                   <a href="{% url 'logout' %}">Logout</a>
+                </div>
+             </div>
+            <a href="javascript:void(0);" id="toggle_btn">
+            <i class="fas fa-align-left"></i>
+            </a>
+            <div class="top-nav-search">
+               <form>
+                  <input type="text" class="form-control" placeholder="Search here">
+                  <button class="btn" type="submit"><i class="fas fa-search"></i></button>
+               </form>
+            </div>
+            <a class="mobile_btn" id="mobile_btn">
+            <i class="fas fa-bars"></i>
+            </a>
+            <ul class="nav user-menu">
+               <li class="nav-item dropdown noti-dropdown">
+                  <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                   {% comment %} {% if unread_notification_count > 0 %}
+                  <i class="far fa-bell"></i> <span class="badge badge-pill">{{unread_notification_count}}</span>
+                  {% endif %} {% endcomment %}
+                  </a>
+                  <div class="dropdown-menu notifications">
+                     <div class="topnav-dropdown-header">
+                        <span class="notification-title">Notifications</span>
+                        <a href="javascript:void(0)" class="clear-noti"> Clear All </a>
+                     </div>
+                     <div class="noti-content">
+                        <ul class="notification-list">
+                           
+                        </ul>
+                     </div>
+                     <div class="topnav-dropdown-footer">
+                        <a href="#">View all Notifications</a>
+                     </div>
+                  </div>
+               </li>
+            </ul>
+         </div>
+         <div class="sidebar" id="sidebar">
+            <div class="sidebar-inner slimscroll">
+               <div id="sidebar-menu" class="sidebar-menu">
+                  <ul>
+                     <li class="menu-title">
+                        <span>Main Menu</span>
+                     </li>
+                     <li >
+                        <a href="{% url 'teacher_dashboard'%}">
+                           <i class="fas fa-user-graduate"></i> Dashboard
+                        </a>
+                     </li>
+      
+                     <li >
+                        <a href="{% url 'students_teacher'%}"><i class="fas fa-user-graduate"></i> <span> Students</span> </a>
+                     </li>
+                     <li >
+                        <a href="{% url 'courses_teacher'%}"><i class="fas fa-book-reader"></i> <span> Courses</span> </a>
+
+                     </li>
+                     <li class="submenu active">
+                        <a href="{% url 'holidays_teacher'%}"><i class="fas fa-holly-berry"></i> <span>Holidays</span></a>
+                     </li>
+                     <li  >
+                        <a href="{% url 'exams_teacher'%}"><i class="fas fa-clipboard-list"></i> <span>Exam list</span></a>
+                     </li>
+
+                  </ul>>
+               </div>
+            </div>
+         </div>
+         <div class="page-wrapper">
+            <div class="content container-fluid">
+               <div class="page-header">
+                  <div class="row align-items-center">
+                     <div class="col">
+                        <h3 class="page-title">Holidays</h3>
+                        <ul class="breadcrumb">
+                           <li class="breadcrumb-item"><a href="">Dashboard</a></li>
+                           <li class="breadcrumb-item active">Holidays</li>
+                        </ul>
+                     </div>
+                     <div class="col-auto text-right float-right ml-auto">
+            
+                        <a href="{% url 'add_holiday' %}" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                {% if holidays %}
+                {% for holiday in holidays %}
+                <div class="col-md-6 col-lg-4 d-flex">
+                    <div class="card exam-card w-100">
+                        <div class="card-body">
+              
+                            <!-- Title -->
+                            <h5 class="card-title">{{ holiday.name }}</h5>
+              
+                            <!-- Start Date -->
+                            <p><strong>Start:</strong> {{ holiday.date_start|date:"M d, Y" }}</p>
+              
+                            <!-- End Date -->
+                            <p><strong>End:</strong> {{ holiday.date_end|date:"M d, Y" }}</p>
+              
+                            <!-- Duration (optional display) -->
+                            <p>
+                                <strong>Duration:</strong>
+                                {{ holiday.date_end|timeuntil:holiday.date_start }}
+                            </p>
+              
+                            <!-- Description -->
+                            <p>
+                                <strong>Description:</strong>
+                                {% if holiday.description %}
+                                    {{ holiday.description|truncatewords:12 }}
+                                {% else %}
+                                    <span class="text-muted">No description</span>
+                                {% endif %}
+                            </p>
+              
+                            <!-- Buttons -->
+                            <div>
+                                <form action="{% url 'delete_holiday' holiday.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm bg-danger-light" onclick="return confirm('Are you sure you want to delete this ?');">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            
+                            </div>
+              
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+              {% else %}
+              <div class="col-12">
+                  <div class="alert alert-info text-center">
+                      No holidays available
+                  </div>
+              </div>
+              {% endif %}
+            </div>
+            </div>
+            <footer>
+               <p>Copyright © 2020 Dreamguys.</p>
+            </footer>
+         </div>
+      </div>
+      <script src="{%static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    
+      <script src="{%static 'assets/js/popper.min.js' %}"></script>
+      <script src="{%static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+      
+      <script src="{%static 'assets/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+      
+      <script src="{%static 'assets/plugins/apexchart/apexcharts.min.js' %}"></script>
+      <script src="{%static 'assets/plugins/apexchart/chart-data.js' %}"></script>
+      
+      <script src="{%static 'assets/plugins/simple-calendar/jquery.simple-calendar.js' %}"></script>
+      <script src="{%static 'assets/plugins/datatables/datatables.min.js' %}"></script>
+      <script src="{%static 'assets/js/calander.js' %}"></script>
+      
+      <script src="{%static 'assets/js/circle-progress.min.js' %}"></script>
+      
+      <script src="{%static 'assets/js/script.js' %}"></script>
+      <script type="text/javascript">
+          document.addEventListener('DOMContentLoaded', function() {
+              // Select the notification dropdown element
+              const notiDropdown = document.querySelector('.noti-dropdown');
+              const clearAllBtn = document.querySelector('.clear-noti');
+      
+              if (notiDropdown) {
+                  // Add a click event listener to the notification dropdown
+                  notiDropdown.addEventListener('click', function() {
+                      const url = "";
+      
+                      // Use the Fetch API to send a POST request to mark notifications as read
+                      fetch(url, {
+                          method: 'POST',
+                          headers: {
+                              'X-CSRFToken': '{{ csrf_token }}',
+                              'Content-Type': 'application/x-www-form-urlencoded',
+                          }
+                      })
+                      .then(response => response.json())  // Parse the JSON response
+                      .then(data => {
+                          if (data.status === 'success') {
+                              // Remove the badge if notifications are successfully marked as read
+                              const badge = document.querySelector('.badge');
+                              if (badge) {
+                                  badge.remove();
+                              }
+                          }
+                      })
+                      .catch(error => {
+                          console.error('Error:', error);  // Log any errors
+                      });
+                  });
+              }
+      
+              if (clearAllBtn) {
+                  // Add a click event listener to the "Clear All" button
+                  clearAllBtn.addEventListener('click', function() {
+                      const clearUrl = "";  // Ensure this URL points to the correct view
+      
+                      // Use Fetch to send a POST request to clear all notifications
+                      fetch(clearUrl, {
+                          method: 'POST',
+                          headers: {
+                              'X-CSRFToken': '{{ csrf_token }}',
+                              'Content-Type': 'application/x-www-form-urlencoded',
+                          }
+                      })
+                      .then(response => response.json())  // Parse the JSON response
+                      .then(data => {
+                          if (data.status === 'success') {
+                              // Clear all notifications from the dropdown
+                              const notificationList = document.querySelector('.notification-list');
+                              if (notificationList) {
+                                  notificationList.innerHTML = '<li>No new notifications</li>';  // Optionally show a "No new notifications" message
+                              }
+                          }
+                      })
+                      .catch(error => {
+                          console.error('Error:', error);  // Log any errors
+                      });
+                  });
+              }
+          });
+      </script>
+      </body>
+      
+      </html>
+      
+      
+
+
+

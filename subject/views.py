@@ -47,4 +47,4 @@ def delete_subject(request, id):
     subject = get_object_or_404(Subject, id=id)
     subject.delete()
     messages.success(request, 'Subject deleted successfully!')
-    return redirect('subject_list')
+    return redirect('courses_teacher')

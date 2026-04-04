@@ -84,16 +84,8 @@ class Student(models.Model):
     mobile_number = models.CharField(max_length=15)
     admission_number = models.CharField(max_length=20)
     section = models.CharField(max_length=10)
-    student_image = models.ImageField(upload_to='students/', blank=True)
     parent = models.OneToOneField(Parent, on_delete=models.CASCADE)
+    student_image = models.ImageField(upload_to='photos/',blank=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.student_id})"
-class Holiday(models.Model):
-    name = models.CharField(max_length=100)
-    date_start = models.DateField()
-    date_end = models.DateField()
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.name

@@ -1,40 +1,32 @@
 # student/views.py
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Student, Parent ,ExamResult,Exam,Holiday
+from .models import Student, Parent ,ExamResult,Exam
+from teacher.models import Teacher
+from subject.models import Subject
+from holiday.models import Holiday
 from department.models import Department
 from datetime import datetime, timedelta
 import calendar
 def student_dashboard(request):
-    # Get logged-in student (adjust if needed)
     student = Student.objects.get(user=request.user)
-
-    # 📚 Courses
     enrolled_courses = student.student_class.count()
     total_courses = 6
-
-    # 📝 Exams
     results = ExamResult.objects.filter(student=student)
-
     total_tests = results.count()
     tests_attended = results.exclude(status='pending').count()
     tests_passed = results.filter(status='passed').count()
-
-    # 📊 Average grade
     grades = results.exclude(grade=None)
     if grades.exists():
         average_grade = round(sum([r.grade for r in grades]) / grades.count(), 2)
     else:
         average_grade = 0
-
-    # 📅 Learning history (you can improve later)
     learning_history = results.select_related('exam').order_by('-exam__exam_date')[:5]
   
     today = datetime.today()
     year = today.year
     month = today.month
-
-    # Exams and holidays
+  #calender
     exams = Exam.objects.filter(exam_date__year=year, exam_date__month=month)
     exam_days = {e.exam_date.day: e for e in exams}
 
@@ -42,8 +34,6 @@ def student_dashboard(request):
         date_start__lte=datetime(year, month, calendar.monthrange(year, month)[1]),
         date_end__gte=datetime(year, month, 1)
     )
-
-    # Build calendar days
     cal = calendar.Calendar()
     days = []
     for day in cal.itermonthdays(year, month):
@@ -85,13 +75,17 @@ def student_dashboard(request):
 
     return render(request, 'students/student-dashboard.html', context)
 def student_list(request):
- return render(request, 'students/students.html')
+ teacher = Teacher.objects.get(user=request.user)
+ subjects = Subject.objects.filter(Teacher=teacher)
+ student_list=  Student.objects.filter(student_class__in=subjects).distinct()
+ return render(request, 'students/students.html',{'Teacher':  teacher,'student_list' :student_list,})
 def edit_student(request, student_id):
  return render(request, 'students/edit-student.html')
 def view_student(request, student_id):
  return render(request, 'students/student-details.html')
 def delete_student(request, student_id):
- return redirect('student_list')
+ Student.objects.filter(student_id=student_id).delete()
+ return redirect('students_teacher')
 def add_student(request):
  if request.method == 'POST':
  # Récupérer les données de l'étudiant

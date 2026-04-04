@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Exam, ExamResult, Parent, Subject, Student,Holiday
+from .models import Exam, ExamResult, Parent, Subject, Student
 
 
 @admin.register(Exam)
@@ -30,12 +30,7 @@ class StudentAdmin(admin.ModelAdmin):
  list_display = ('first_name', 'last_name', 'student_id',
  'gender', 'date_of_birth', 'get_class',
  'joining_date', 'mobile_number',
- 'admission_number', 'section')
+ 'admission_number', 'section','student_image')
  search_fields = ('first_name', 'last_name', 'student_id',
  'get_class', 'admission_number')
  list_filter = ('gender', 'section')
- readonly_fields = ('student_image',)
-@admin.register(Holiday)
-class HolidayAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date_start', 'date_end')
-    search_fields = ('name',)

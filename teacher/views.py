@@ -1,16 +1,67 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Teacher
+from student.models import Student,Exam,ExamResult
+from subject.models import Subject
+from holiday.models import Holiday
 from department.models import Department
+from django.utils import timezone
+from datetime import datetime
+import calendar
 
 def dashboard(request):
-    teachers    = Teacher.objects.all()
-    departments = Department.objects.prefetch_related('teacher_set').all()
+    Teacherr = Teacher.objects.get(user=request.user)
+    subjects = Subject.objects.filter(Teacher=Teacherr)
+    students   =  Student.objects.filter(student_class__in=subjects).distinct()
+    upcoming_exams= Exam.objects.filter(
+        subject__in=subjects,
+        exam_date__gt=timezone.now()
+    )
+    papers_To_Grade= ExamResult.objects.filter(
+        exam__subject__in=subjects,
+        status='pending'
+    )
+    today = datetime.today()
+    year = today.year
+    month = today.month
+  #calender
+    exams = Exam.objects.filter(exam_date__year=year, exam_date__month=month)
+    exam_days = {e.exam_date.day: e for e in exams}
+
+    holidays = Holiday.objects.filter(
+        date_start__lte=datetime(year, month, calendar.monthrange(year, month)[1]),
+        date_end__gte=datetime(year, month, 1)
+    )
+    cal = calendar.Calendar()
+    days = []
+    for day in cal.itermonthdays(year, month):
+        if day == 0:
+            days.append({'day': 0})
+            continue
+
+        date_obj = datetime(year, month, day)
+        is_weekend = date_obj.weekday() >= 5
+        holiday = next((h for h in holidays if h.date_start <= date_obj.date() <= h.date_end), None)
+        exam = exam_days.get(day)
+
+        days.append({
+            'day': day,
+            'is_weekend': is_weekend,
+            'holiday': holiday,
+            'exam': exam
+        })
+
+    # Split days into weeks (lists of 7)
+    weeks = [days[i:i+7] for i in range(0, len(days), 7)]
     context = {
-        'teachers':         teachers,
-        'departments':      departments,
-        'total_teachers':   teachers.count(),
-        'total_departments': departments.count(),
+        'students':  students,
+        'subjects':  subjects,
+        'upcoming_exams': upcoming_exams,
+        'papers_To_Grade':  papers_To_Grade,
+        'Teacher':  Teacherr,
+        'weeks': weeks,
+        'month_name': calendar.month_name[month],
+        'year': year
     }
     return render(request, 'teachers/teacher_dashboard.html', context)
 
@@ -69,3 +120,64 @@ def delete_teacher(request, id):
     teacher.delete()
     messages.success(request, 'Teacher deleted successfully!')
     return redirect('teacher_list')
+def exams_teacher(request):
+    user=request.user
+    teacher = Teacher.objects.get(user=request.user)
+    subjects = Subject.objects.filter(Teacher=teacher)
+
+    upcoming_exams = Exam.objects.filter(
+        subject__in=subjects,
+        exam_date__gt=timezone.now()
+    )
+
+    past_exams = Exam.objects.filter(
+        subject__in=subjects,
+        exam_date__lte=timezone.now()
+    )
+
+    return render(request, 'teachers/exams_teacher.html', {
+        'upcoming_exams': upcoming_exams,
+        'past_exams': past_exams,
+        'Teacher':  teacher,
+    })
+def courses_teacher(request):
+    user=request.user
+    teacher = Teacher.objects.get(user=request.user)
+    subjects = Subject.objects.filter(Teacher=teacher)
+
+    return render(request, 'teachers/courses_teacher.html', {
+        'subjects': subjects,
+        'Teacher':  teacher,
+    })
+def holidays_teacher(request):
+    user=request.user
+    teacher = Teacher.objects.get(user=request.user)
+    holidays= Holiday.objects.all()
+
+    return render(request, 'teachers/holiday.html', {
+        'holidays': holidays,
+        'Teacher':  teacher,
+    })
+
+def add_exam(request):
+    user=request.user
+    teacher = Teacher.objects.get(user=request.user)
+    holidays= Holiday.objects.all()
+
+    return render(request, 'teachers/courses_teacher.html', {
+        'holidays': holidays,
+        'Teacher':  teacher,
+    })
+def edit_exam(request):
+    user=request.user
+    teacher = Teacher.objects.get(user=request.user)
+    holidays= Holiday.objects.all()
+
+    return render(request, 'teachers/courses_teacher.html', {
+        'holidays': holidays,
+        'Teacher':  teacher,
+    })
+def delete_exam(request,id):
+  Exam.objects.filter(id=id).delete()
+
+  return render('teachers/exams_teacher.html')

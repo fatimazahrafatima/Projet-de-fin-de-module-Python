@@ -18,4 +18,4 @@ def add_holiday(request):
 
 def delete_holiday(request, pk):
     Holiday.objects.filter(pk=pk).delete()
-    return redirect('holiday_list')
+    return redirect('holidays_teacher')

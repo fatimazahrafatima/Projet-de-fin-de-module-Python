@@ -57,7 +57,11 @@
             <div class="header-left">
                 <div class="user-header">
                    <div class="avatar avatar-sm">
-                      <img src="{% static 'assets/img/profiles/avatar-01.jpg' %}" alt="User Image" class="avatar-img rounded-circle">
+                    {% if student.student_image %}
+                    <img src="{{student.student_image.url }}" alt="User Image" class="avatar-img rounded-circle">
+                    {% else %}
+                    <img src="{% static 'assets/img/profiles/avatar-01.jpg' %}"alt="User Image" class="avatar-img rounded-circle">
+                    {% endif %}
                    </div>
                    <div class="user-text">
                       <p class="text-muted mb-0">{{ student.first_name }} {{ student.last_name }}</p>
@@ -125,7 +129,7 @@
       
                      <li >
                         <a href="{% url 'Courses_ur'%}">
-                           <i class="fas fa-book-reader"></i> Clases
+                           <i class="fas fa-book-reader"></i> Courses
                         </a>
                      </li>
                      <li>
