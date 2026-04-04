@@ -1,5 +1,7 @@
 {% load static %}
 
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
    
@@ -17,67 +19,17 @@
         .header-left {
             min-width: 250px;
         }
-        .exam-day {
-         background-color: #dc3545;
-         color: white;
-         font-weight: bold;
+        .exam-card {
+            transition: 0.3s;
+            border-left: 5px solid #007bff;
         }
-
-        .holiday-day {
-         background-color: #007bff;
-         color: white;
-         font-weight: bold;
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
-        .weekend-day {
-         background-color: #838383;
-         color: black;
-        }
-       .calendar-table td {
-         height: 50px;
-         width: 50px;
-         vertical-align: middle;
-        }
-        
-       .tooltip-text {
-    visibility: hidden;
-    width: 180px;
-    background-color: #47e100;
-    color: #fff;
-    text-align: left;
-    padding: 5px 10px;
-    border-radius: 6px;
-    position: absolute;
-    z-index: 10;
-    bottom: 110%; /* show above the cell */
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 13px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-
-/* Arrow at the bottom */
-.tooltip-text::after {
-    content: "";
-    position: absolute;
-    top: 100%; /* bottom of tooltip */
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #333 transparent transparent transparent;
-}
-.calendar-table td {
-    position: relative;  /* VERY IMPORTANT */
-}
-/* Show tooltip on hover */
-.calendar-table td:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-      </style>
+        .badge-midterm { background-color: #ffc107; }
+        .badge-final { background-color: #dc3545; }
+        .badge-quiz { background-color: #28a745; }    </style>
     </head>
    <body>
       <div class="main-wrapper">
@@ -139,7 +91,7 @@
                      <li class="menu-title">
                         <span>Main Menu</span>
                      </li>
-                     <li class="submenu active">
+                     <li >
                         <a href="{% url 'student_dashboard'%}">
                            <i class="fas fa-user-graduate"></i> Dashboard
                         </a>
@@ -156,7 +108,7 @@
                            <i class="fas fa-book-reader"></i> Clases
                         </a>
                      </li>
-                     <li>
+                     <li class="submenu active">
                         <a href="{% url 'Exam_ur'%}"><i class="fas fa-file-alt"></i> <span>Exam list</span></a>
                      </li>
                      <li>
@@ -166,187 +118,64 @@
                </div>
             </div>
          </div>
-     
-<div class="page-wrapper">
-<div class="content container-fluid">
-<div class="page-header">
-<div class="row">
-<div class="col-sm-12">
-<h3 class="page-title">Welcome {{ student.first_name }} {{ student.last_name }}!</h3>
-<ul class="breadcrumb">
-<li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-<li class="breadcrumb-item active">Student Dashboard</li>
-</ul>
-</div>
-</div>
-</div>
+ 
+    <div class="page-wrapper">
+        <div class="content container-fluid">
 
-
-<div class="row">
-<div class="col-xl-3 col-sm-6 col-12 d-flex">
-<div class="card bg-nine w-100">
-<div class="card-body">
-<div class="db-widgets d-flex justify-content-between align-items-center">
-<div class="db-icon">
-<i class="fas fa-book-open"></i>
-</div>
-<div class="db-info">
-    <h3>{{ enrolled_courses }}/{{ total_courses }}</h3>
-<h6>enrolled Courses</h6>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="col-xl-3 col-sm-6 col-12 d-flex">
-<div class="card bg-six w-100">
-<div class="card-body">
-<div class="db-widgets d-flex justify-content-between align-items-center">
-<div class="db-icon">
-<i class="fas fa-file-alt"></i>
-</div>
-<div class="db-info">
-    <h3>{{ average_grade }}</h3>
-<h6>grades avrege</h6>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="col-xl-3 col-sm-6 col-12 d-flex">
-<div class="card bg-ten w-100">
-<div class="card-body">
-<div class="db-widgets d-flex justify-content-between align-items-center">
-<div class="db-icon">
-<i class="fas fa-clipboard-list"></i>
-</div>
-<div class="db-info">
-    <h3>{{ tests_attended }}/{{ total_tests }}</h3>
-<h6>Test Attended</h6>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="col-xl-3 col-sm-6 col-12 d-flex">
-<div class="card bg-eleven w-100">
-<div class="card-body">
-<div class="db-widgets d-flex justify-content-between align-items-center">
-<div class="db-icon">
-<i class="fas fa-clipboard-check"></i>
-</div>
-<div class="db-info">
-<h3>{{ tests_passed }}/{{ total_tests }}</h3>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-
-<div class="row">
-
-    <!-- LEFT SIDE (Learning History) -->
-    <div class="col-xl-4 d-flex">
-        <div class="card flex-fill">
-            <div class="card-header">
-                <h5 class="card-title">Learning History</h5>
+            <div class="page-header">
+                <h3 class="page-title">All Exams</h3>
             </div>
-            <div class="card-body">
-                <div class="teaching-card">
-                    <ul class="activity-feed">
-                        {% for result in learning_history %}
-                        <li class="feed-item">
-                            <div class="feed-date1">
-                                {{ result.exam.exam_date|date:"M d, H:i" }} 
-                                ({{ result.exam.duration }})
-                            </div>
-                        
-                            <span class="feed-text1">
-                                <a>{{ result.exam.title }} - {{ result.exam.subject.name }}</a>
-                            </span>
-                        
+
+            <div class="row">
+                {% for exam in exams %}
+                <div class="col-md-6 col-lg-4 d-flex">
+                    <div class="card exam-card w-100">
+                        <div class="card-body">
+
+                            <!-- Title -->
+                            <h5 class="card-title">{{ exam.title }}</h5>
+
+                            <!-- Subject -->
+                            <p><strong>Subject:</strong> {{ exam.subject.name }}</p>
+
+                            <!-- Type -->
                             <p>
-                                {% if result.status == 'passed' %}
-                                    <span style="color: green;">Passed</span>
-                                {% elif result.status == 'failed' %}
-                                    <span style="color: red;">Failed</span>
+                                <strong>Type:</strong>
+                                {% if exam.exam_type == "Midterm" %}
+                                    <span class="badge badge-midterm">Midterm</span>
+                                {% elif exam.exam_type == "Final" %}
+                                    <span class="badge badge-final">Final</span>
                                 {% else %}
-                                    <span style="color: orange;">Pending</span>
+                                    <span class="badge badge-quiz">Quiz</span>
                                 {% endif %}
                             </p>
-                        </li>
-                        {% empty %}
-                        <li>No activity yet</li>
-                        {% endfor %}
-                    </ul>
+
+                            <!-- Date -->
+                            <p><strong>Date:</strong> {{ exam.exam_date|date:"M d, Y H:i" }}</p>
+
+                            <!-- Duration -->
+                            <p><strong>Duration:</strong> {{ exam.duration }}</p>
+
+                            <!-- Marks -->
+                            <p><strong>Total Marks:</strong> {{ exam.total_marks }}</p>
+
+                        </div>
+                    </div>
                 </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        No exams available
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-        </div>
-    </div>
 
-    <!-- RIGHT SIDE (Calendar) -->
-    <div class="col-xl-8 d-flex">
-        <div class="card flex-fill">
-            <div class="card-header">
-                <h5 class="card-title">{{month_name}}  <span style="font-size: 25px;"><strong>   {{year}}</strong></span></h5>
-            </div>
-            <div class="calendar-container">
-                <table class="calendar-table table table-bordered text-center">
-                    <thead>
-                        <tr>
-                            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th>
-                            <th>Fri</th><th>Sat</th><th>Sun</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for week in weeks %}
-                        <tr>
-                            {% for day in week %}
-                                {% if day.day == 0 %}
-                                    <td></td>
-                                {% elif day.exam %}
-                                <td class="exam-day" >
-                                    {{ day.day }}   
-                                    <div class="tooltip-text">
-                                        {{ day.exam.exam_type }} : {{ day.exam.subject.name }}
-                                    </div>
-                                </td>
-                                {% elif day.is_weekend %}
-                                    <td class="weekend-day">{{ day.day }}</td>
-                                    
-                                {% elif day.holiday %}
-                                    <td class="holiday-day" >    
-                                        <div class="tooltip-text">
-                                            holiday : {{ day.holiday.name }}
-                                       </div>{{ day.day }}</td>
-                                {% else %}
-                                    <td>{{ day.day }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 
 </div>
 
-
-</div>
-
-<footer>
-<p>Copyright © 2020 Dreamguys.</p>
-</footer>
-
-</div>
-
-</div>
-
-</div>
 <script src="{%static 'assets/js/jquery-3.6.0.min.js' %}"></script>
 
 <script src="{%static 'assets/js/popper.min.js' %}"></script>
@@ -429,6 +258,4 @@
     });
 </script>
 </body>
-
 </html>
-

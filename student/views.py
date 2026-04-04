@@ -2,11 +2,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Student, Parent ,ExamResult,Exam,Holiday
+from department.models import Department
 from datetime import datetime, timedelta
 import calendar
 def student_dashboard(request):
     # Get logged-in student (adjust if needed)
-    student = Student.objects.first()   # ⚠️ change later to request.user
+    student = Student.objects.get(user=request.user)
 
     # 📚 Courses
     enrolled_courses = student.student_class.count()
@@ -147,4 +148,32 @@ def add_student(request):
  else:
   return render(request, 'students/add-student.html')
  
+def departmentsve(request):
+  student = Student.objects.get(user=request.user)
+  user=request.user
+  departments = Department.objects.all()
+  context = {'student': student,
+             'departments':departments}
+  return render(request,'students/departments.html',context)
+def Courses_ve(request):
+  student = Student.objects.get(user=request.user)
+  user=request.user
+  Courses = student.student_class.all()
+  context = {'student': student,
+             'Courses':Courses}
+  return render(request,'students/Courses.html',context)
+def Exam_ve(request):
+  user=request.user
+  student = Student.objects.get(user=request.user)
+  exams = Exam.objects.filter(subject__in=student.student_class.all())
+  context = {'student': student,
+             'exams':exams}
+  return render(request,'students/Exam.html',context)
+def grades_ve(request):
+  user=request.user
+  student = Student.objects.get(user=request.user)
+  exam_results = student.exam_results.select_related('exam', 'exam__subject')
 
+  context = {'student': student,
+        'exam_results': exam_results}
+  return render(request,'students/grades.html',context)

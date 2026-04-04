@@ -1,6 +1,7 @@
 from django.db import models
-
+from home_auth.models import CustomUser
 class Teacher(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     teacher_id = models.CharField(max_length=20)

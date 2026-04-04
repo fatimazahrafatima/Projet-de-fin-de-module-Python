@@ -1,6 +1,6 @@
 from django.db import models
 from subject.models import Subject
-
+from home_auth.models import CustomUser
 class ExamResult(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -72,6 +72,7 @@ class Parent(models.Model):
 
 
 class Student(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     student_id = models.CharField(max_length=20)
