@@ -1,0 +1,137 @@
+{% load static %}
+{% extends 'Home/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h4>Details de l'Enseignant</h4>
+      <p class="text-muted">Dashboard / Teachers / Details</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <a href="{% url 'teacher_list' %}" class="btn btn-outline-secondary me-2">
+        Retour
+      </a>
+      <a href="{% url 'edit_teacher' teacher.id %}" class="btn btn-primary">
+        Modifier
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <!-- Carte profil -->
+    <div class="col-md-4">
+      <div class="card text-center p-4 mb-4">
+        {% if teacher.teacher_image %}
+          <img src="{{ teacher.teacher_image.url }}"
+               width="100" height="100"
+               style="border-radius:50%;object-fit:cover;margin:0 auto 16px;">
+        {% else %}
+          <div style="width:100px;height:100px;border-radius:50%;
+                      background:#E6F1FB;display:flex;
+                      align-items:center;justify-content:center;
+                      font-weight:500;color:#185FA5;font-size:32px;
+                      margin:0 auto 16px;">
+            {{ teacher.first_name|first }}{{ teacher.last_name|first }}
+          </div>
+        {% endif %}
+        <h5>{{ teacher.first_name }} {{ teacher.last_name }}</h5>
+        <p class="text-muted mb-2">{{ teacher.subject }}</p>
+        <span class="badge" style="background:#E6F1FB;color:#185FA5;">
+          {{ teacher.department }}
+        </span>
+        <hr>
+        <div class="text-start">
+          <p class="mb-1" style="font-size:13px;">
+            <strong>ID :</strong> {{ teacher.teacher_id }}
+          </p>
+          <p class="mb-1" style="font-size:13px;">
+            <strong>Mobile :</strong> {{ teacher.mobile_number }}
+          </p>
+          <p class="mb-1" style="font-size:13px;">
+            <strong>Email :</strong> {{ teacher.email }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infos details -->
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h6 class="card-title" style="color:#185FA5;">
+            Informations personnelles
+          </h6>
+          <div class="row">
+            <div class="col-md-6">
+              <table class="table table-sm">
+                <tr>
+                  <td class="text-muted">Prenom</td>
+                  <td><strong>{{ teacher.first_name }}</strong></td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Nom</td>
+                  <td><strong>{{ teacher.last_name }}</strong></td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Genre</td>
+                  <td>{{ teacher.gender|default:"-" }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Date naissance</td>
+                  <td>{{ teacher.date_of_birth|date:"d/m/Y"|default:"-" }}</td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <table class="table table-sm">
+                <tr>
+                  <td class="text-muted">Mobile</td>
+                  <td>{{ teacher.mobile_number }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Email</td>
+                  <td>{{ teacher.email|default:"-" }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Adresse</td>
+                  <td>{{ teacher.address|default:"-" }}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title" style="color:#185FA5;">
+            Informations professionnelles
+          </h6>
+          <table class="table table-sm">
+            <tr>
+              <td class="text-muted">Departement</td>
+              <td><strong>{{ teacher.department }}</strong></td>
+            </tr>
+            <tr>
+              <td class="text-muted">Matiere</td>
+              <td>{{ teacher.subject }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Date recrutement</td>
+              <td>{{ teacher.joining_date|date:"d/m/Y"|default:"-" }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">ID Enseignant</td>
+              <td>{{ teacher.teacher_id }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

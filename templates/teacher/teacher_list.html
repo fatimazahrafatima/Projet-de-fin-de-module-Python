@@ -1,0 +1,139 @@
+{% load static %}
+{% extends 'Home/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h4>Liste des Enseignants</h4>
+      <p class="text-muted">Dashboard / Teachers / List</p>
+    </div>
+    <div class="col-md-6 text-end">
+      <a href="{% url 'add_teacher' %}" class="btn btn-primary">
+        + Ajouter un enseignant
+      </a>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Stats -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center p-3" style="background:#E6F1FB;border:none;">
+        <h3 style="color:#185FA5;">{{ teachers.count }}</h3>
+        <p style="color:#185FA5;margin:0;font-size:13px;">Total Enseignants</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center p-3" style="background:#E1F5EE;border:none;">
+        <h3 style="color:#0F6E56;">{{ departments.count }}</h3>
+        <p style="color:#0F6E56;margin:0;font-size:13px;">Departements</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="card">
+    <div class="card-body">
+
+      <!-- Barre de recherche -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <input type="text" id="searchInput" class="form-control"
+                 placeholder="Rechercher un enseignant...">
+        </div>
+        <div class="col-md-3">
+          <select id="deptFilter" class="form-select">
+            <option value="">Tous les departements</option>
+            {% for dept in departments %}
+            <option value="{{ dept.name }}">{{ dept.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <table class="table table-hover" id="teacherTable">
+        <thead style="background:#f8f9fa;">
+          <tr>
+            <th>Photo</th>
+            <th>Nom complet</th>
+            <th>ID</th>
+            <th>Departement</th>
+            <th>Matiere</th>
+            <th>Mobile</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for teacher in teachers %}
+          <tr>
+            <td>
+              {% if teacher.teacher_image %}
+                <img src="{{ teacher.teacher_image.url }}"
+                     width="40" height="40"
+                     style="border-radius:50%;object-fit:cover;">
+              {% else %}
+                <div style="width:40px;height:40px;border-radius:50%;
+                            background:#E6F1FB;display:flex;
+                            align-items:center;justify-content:center;
+                            font-weight:500;color:#185FA5;">
+                  {{ teacher.first_name|first }}{{ teacher.last_name|first }}
+                </div>
+              {% endif %}
+            </td>
+            <td><strong>{{ teacher.first_name }} {{ teacher.last_name }}</strong></td>
+            <td><span class="badge bg-light text-dark">{{ teacher.teacher_id }}</span></td>
+            <td>{{ teacher.department }}</td>
+            <td>{{ teacher.subject }}</td>
+            <td>{{ teacher.mobile_number }}</td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'view_teacher' teacher.id %}"
+                   class="btn btn-sm btn-outline-primary">
+                  Voir
+                </a>
+                <a href="{% url 'edit_teacher' teacher.id %}"
+                   class="btn btn-sm btn-outline-warning">
+                  Modifier
+                </a>
+                <a href="{% url 'delete_teacher' teacher.id %}"
+                   class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Supprimer cet enseignant ?')">
+                  Supprimer
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              Aucun enseignant trouve.
+              <a href="{% url 'add_teacher' %}">Ajouter le premier !</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function() {
+  const val = this.value.toLowerCase();
+  document.querySelectorAll('#teacherTable tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+});
+</script>
+{% endblock %}

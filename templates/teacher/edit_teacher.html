@@ -1,0 +1,125 @@
+{% load static %}
+{% extends 'Home/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h4>Modifier l'Enseignant</h4>
+      <p class="text-muted">Dashboard / Teachers / Modifier</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <a href="{% url 'teacher_list' %}" class="btn btn-outline-secondary">
+        Retour
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h6 class="mb-3" style="color:#185FA5;border-bottom:2px solid #E6F1FB;padding-bottom:8px;">
+          Informations personnelles
+        </h6>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Prenom</label>
+            <input type="text" name="first_name" class="form-control"
+                   value="{{ teacher.first_name }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nom</label>
+            <input type="text" name="last_name" class="form-control"
+                   value="{{ teacher.last_name }}" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">ID Enseignant</label>
+            <input type="text" name="teacher_id" class="form-control"
+                   value="{{ teacher.teacher_id }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mobile</label>
+            <input type="text" name="mobile_number" class="form-control"
+                   value="{{ teacher.mobile_number }}">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control"
+                   value="{{ teacher.email|default:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Genre</label>
+            <select name="gender" class="form-select">
+              <option value="Male" {% if teacher.gender == 'Male' %}selected{% endif %}>Homme</option>
+              <option value="Female" {% if teacher.gender == 'Female' %}selected{% endif %}>Femme</option>
+            </select>
+          </div>
+        </div>
+
+        <h6 class="mb-3 mt-4" style="color:#185FA5;border-bottom:2px solid #E6F1FB;padding-bottom:8px;">
+          Informations professionnelles
+        </h6>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Departement</label>
+            <select name="department" class="form-select">
+              {% for dept in departments %}
+              <option value="{{ dept.id }}"
+                {% if teacher.department.id == dept.id %}selected{% endif %}>
+                {{ dept.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Matiere</label>
+            <input type="text" name="subject" class="form-control"
+                   value="{{ teacher.subject }}">
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <label class="form-label">Photo actuelle</label>
+            {% if teacher.teacher_image %}
+              <div class="mb-2">
+                <img src="{{ teacher.teacher_image.url }}"
+                     width="60" height="60"
+                     style="border-radius:50%;object-fit:cover;">
+              </div>
+            {% endif %}
+            <input type="file" name="teacher_image" class="form-control"
+                   accept="image/*">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Adresse</label>
+            <input type="text" name="address" class="form-control"
+                   value="{{ teacher.address|default:'' }}">
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary px-4">
+            Sauvegarder les modifications
+          </button>
+          <a href="{% url 'teacher_list' %}" class="btn btn-outline-secondary px-4">
+            Annuler
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

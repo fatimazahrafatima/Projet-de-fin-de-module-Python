@@ -77,6 +77,7 @@ def login_view(request):
                 return redirect('/admin/')
             elif user.is_teacher:
                 return redirect('departmentsur')
+                return redirect('teacher_dashboard')
             elif user.is_student:
                 return redirect('student_dashboard')
             else:
