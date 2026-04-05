@@ -100,7 +100,7 @@
                         </a>
                      </li>
       
-                     <li class="submenu active">
+                     <li >
                         <a href="{% url 'students_teacher'%}"><i class="fas fa-user-graduate"></i> <span> Students</span> </a>
                      </li>
                      <li >
@@ -110,7 +110,7 @@
                      <li >
                         <a href="{% url 'holidays_teacher'%}"><i class="fas fa-holly-berry"></i> <span>Holidays</span></a>
                      </li>
-                     <li  >
+                     <li  class="submenu active">
                         <a href="{% url 'exams_teacher'%}"><i class="fas fa-clipboard-list"></i> <span>Exam list</span></a>
                      </li>
 
@@ -121,132 +121,56 @@
          <div class="page-wrapper">
             <div class="content container-fluid">
           
-              <div class="page-header">
-                <h3 class="page-title">Add Student</h3>
-              </div>
+              <h3>
+                Add Results for: 
+                {{ exam.title }} ({{ exam.subject.name }})
+              </h3>
           
-              <div class="card">
-                <div class="card-body">
+              <form method="POST">
+                {% csrf_token %}
           
-                  <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Grade</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
           
-                    <!-- USER INFO -->
-                    <h5 class="form-title">Account Information</h5>
+                  <tbody>
+                    {% for student in students %}
+                    <tr>
+                      <td>
+                        {{ student.first_name }} {{ student.last_name }}
+                      </td>
           
-                    <div class="row">
-
+                      <td>
+                        <input type="number" step="0.1"
+                               name="grade_{{ student.id }}"
+                               class="form-control">
+                      </td>
           
-                      <div class="col-md-6">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control" required>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                      </div>
-                    </div>
-          
-                    <!-- STUDENT INFO -->
-                    <h5 class="form-title mt-4">Student Information</h5>
-          
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label>First Name</label>
-                        <input type="text" name="first_name" class="form-control" required>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Last Name</label>
-                        <input type="text" name="last_name" class="form-control" required>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Student ID</label>
-                        <input type="text" name="student_id" class="form-control" required>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Gender</label>
-                        <select name="gender" class="form-control">
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
+                      <td>
+                        <select name="status_{{ student.id }}" class="form-control">
+                          <option value="pending">Pending</option>
+                          <option value="passed">Passed</option>
+                          <option value="failed">Failed</option>
                         </select>
-                      </div>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="3">No students enrolled in this subject</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
           
-                      <div class="col-md-6">
-                        <label>Date of Birth</label>
-                        <input type="date" name="date_of_birth" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Joining Date</label>
-                        <input type="date" name="joining_date" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Mobile</label>
-                        <input type="text" name="mobile_number" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Admission Number</label>
-                        <input type="text" name="admission_number" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Section</label>
-                        <input type="text" name="section" class="form-control">
-                      </div>
-          
-                      <!-- MANY TO MANY -->
-                      <div class="col-md-12">
-                        <label>Subjects</label>
-                        <select name="student_class" class="form-control" multiple>
-                          {% for subject in subjects %}
-                            <option value="{{ subject.id }}">{{ subject.name }}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Student Image</label>
-                        <input type="file" name="student_image" class="form-control">
-                      </div>
-                    </div>
-          
-                    <!-- PARENT -->
-                    <h5 class="form-title mt-4">Parent Information</h5>
-          
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label>Father Name</label>
-                        <input type="text" name="father_name" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Father Phone</label>
-                        <input type="text" name="father_mobile" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Mother Name</label>
-                        <input type="text" name="mother_name" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Mother Phone</label>
-                        <input type="text" name="mother_mobile" class="form-control">
-                      </div>
-                    </div>
-          
-                    <br>
-                    <button type="submit" class="btn btn-primary">Create Student</button>
-          
-                  </form>
-                </div>
-              </div>
+                <button type="submit" class="btn btn-primary">
+                  Save Results
+                </button>
+              </form>
           
             </div>
           </div>

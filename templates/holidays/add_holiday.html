@@ -100,14 +100,14 @@
                         </a>
                      </li>
       
-                     <li class="submenu active">
+                     <li >
                         <a href="{% url 'students_teacher'%}"><i class="fas fa-user-graduate"></i> <span> Students</span> </a>
                      </li>
                      <li >
                         <a href="{% url 'courses_teacher'%}"><i class="fas fa-book-reader"></i> <span> Courses</span> </a>
 
                      </li>
-                     <li >
+                     <li class="submenu active">
                         <a href="{% url 'holidays_teacher'%}"><i class="fas fa-holly-berry"></i> <span>Holidays</span></a>
                      </li>
                      <li  >
@@ -122,129 +122,47 @@
             <div class="content container-fluid">
           
               <div class="page-header">
-                <h3 class="page-title">Add Student</h3>
+                <h3 class="page-title">Add Holiday</h3>
               </div>
           
               <div class="card">
                 <div class="card-body">
           
-                  <form method="POST" enctype="multipart/form-data">
+                  <form method="POST">
                     {% csrf_token %}
           
-                    <!-- USER INFO -->
-                    <h5 class="form-title">Account Information</h5>
-          
                     <div class="row">
-
           
                       <div class="col-md-6">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control" required>
+                        <label>Holiday Name</label>
+                        <input type="text" name="name" class="form-control" required>
                       </div>
           
                       <div class="col-md-6">
-                        <label>Password</label>
-                        <input type="password" name="password" class="form-control" required>
+                        <label>Start Date</label>
+                        <input type="date" name="date_start" class="form-control" required>
                       </div>
+          
+                      <div class="col-md-6 mt-3">
+                        <label>End Date</label>
+                        <input type="date" name="date_end" class="form-control" required>
+                      </div>
+          
+                      <div class="col-md-12 mt-3">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control"></textarea>
+                      </div>
+          
+                      <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                          Create Holiday
+                        </button>
+                      </div>
+          
                     </div>
-          
-                    <!-- STUDENT INFO -->
-                    <h5 class="form-title mt-4">Student Information</h5>
-          
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label>First Name</label>
-                        <input type="text" name="first_name" class="form-control" required>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Last Name</label>
-                        <input type="text" name="last_name" class="form-control" required>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Student ID</label>
-                        <input type="text" name="student_id" class="form-control" required>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Gender</label>
-                        <select name="gender" class="form-control">
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                        </select>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Date of Birth</label>
-                        <input type="date" name="date_of_birth" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Joining Date</label>
-                        <input type="date" name="joining_date" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Mobile</label>
-                        <input type="text" name="mobile_number" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Admission Number</label>
-                        <input type="text" name="admission_number" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Section</label>
-                        <input type="text" name="section" class="form-control">
-                      </div>
-          
-                      <!-- MANY TO MANY -->
-                      <div class="col-md-12">
-                        <label>Subjects</label>
-                        <select name="student_class" class="form-control" multiple>
-                          {% for subject in subjects %}
-                            <option value="{{ subject.id }}">{{ subject.name }}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Student Image</label>
-                        <input type="file" name="student_image" class="form-control">
-                      </div>
-                    </div>
-          
-                    <!-- PARENT -->
-                    <h5 class="form-title mt-4">Parent Information</h5>
-          
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label>Father Name</label>
-                        <input type="text" name="father_name" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Father Phone</label>
-                        <input type="text" name="father_mobile" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Mother Name</label>
-                        <input type="text" name="mother_name" class="form-control">
-                      </div>
-          
-                      <div class="col-md-6">
-                        <label>Mother Phone</label>
-                        <input type="text" name="mother_mobile" class="form-control">
-                      </div>
-                    </div>
-          
-                    <br>
-                    <button type="submit" class="btn btn-primary">Create Student</button>
           
                   </form>
+          
                 </div>
               </div>
           

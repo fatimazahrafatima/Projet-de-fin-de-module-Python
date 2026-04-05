@@ -7,6 +7,8 @@ from subject.models import Subject
 from holiday.models import Holiday
 from department.models import Department
 from datetime import datetime, timedelta
+from home_auth.models import CustomUser
+from django.contrib import messages
 import calendar
 def student_dashboard(request):
     student = Student.objects.get(user=request.user)
@@ -53,7 +55,6 @@ def student_dashboard(request):
             'exam': exam
         })
 
-    # Split days into weeks (lists of 7)
     weeks = [days[i:i+7] for i in range(0, len(days), 7)]
 
 
@@ -87,60 +88,59 @@ def delete_student(request, student_id):
  Student.objects.filter(student_id=student_id).delete()
  return redirect('students_teacher')
 def add_student(request):
- if request.method == 'POST':
- # Récupérer les données de l'étudiant
-  first_name = request.POST.get('first_name')
-  last_name = request.POST.get('last_name')
-  student_id = request.POST.get('student_id')
-  gender = request.POST.get('gender')
-  date_of_birth = request.POST.get('date_of_birth')
-  student_class = request.POST.get('student_class')
-  joining_date = request.POST.get('joining_date')
-  mobile_number = request.POST.get('mobile_number')
-  admission_number = request.POST.get('admission_number')
-  section = request.POST.get('section')
-  student_image = request.FILES.get('student_image')
-  # Récupérer les données du parent
-  father_name = request.POST.get('father_name')
-  father_occupation = request.POST.get('father_occupation')
-  father_mobile = request.POST.get('father_mobile')
-  father_email = request.POST.get('father_email')
-  mother_name = request.POST.get('mother_name')
-  mother_occupation = request.POST.get('mother_occupation')
-  mother_mobile = request.POST.get('mother_mobile')
-  mother_email = request.POST.get('mother_email')
-  present_address = request.POST.get('present_address')
-  permanent_address = request.POST.get('permanent_address')
-  parent = Parent.objects.create(
-   father_name=father_name,
-   father_occupation=father_occupation,
-   father_mobile=father_mobile,
-   father_email=father_email,
-   mother_name=mother_name,
-   mother_occupation=mother_occupation,
-   mother_mobile=mother_mobile,
-   mother_email=mother_email,
-   present_address=present_address,
-   permanent_address=permanent_address
-    )
-  student = Student.objects.create(
-   first_name=first_name,
-   last_name=last_name,
-   student_id=student_id,
-   gender=gender,
-   date_of_birth=date_of_birth,
-   student_class=student_class,
-   joining_date=joining_date,
-   mobile_number=mobile_number,
-   admission_number=admission_number,
-   section=section,
-   student_image=student_image,
-   parent=parent
-   )
-  messages.success(request, 'Student added Successfully')
-  return redirect('student_list')
- else:
-  return render(request, 'students/add-student.html')
+
+    subjects = Subject.objects.all()
+
+    if request.method == "POST":
+        # USER
+        username = request.POST.get("email")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        user = CustomUser.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        user.is_student = True
+        user.save()
+
+        # PARENT
+        parent = Parent.objects.create(
+            father_name=request.POST.get("father_name"),
+            father_mobile=request.POST.get("father_mobile"),
+            mother_name=request.POST.get("mother_name"),
+            mother_mobile=request.POST.get("mother_mobile"),
+        )
+
+        # STUDENT
+        student = Student.objects.create(
+            user=user,
+            first_name=request.POST.get("first_name"),
+            last_name=request.POST.get("last_name"),
+            student_id=request.POST.get("student_id"),
+            gender=request.POST.get("gender"),
+            date_of_birth=request.POST.get("date_of_birth"),
+            joining_date=request.POST.get("joining_date"),
+            mobile_number=request.POST.get("mobile_number"),
+            admission_number=request.POST.get("admission_number"),
+            section=request.POST.get("section"),
+            parent=parent,
+            student_image=request.FILES.get("student_image")
+        )
+
+        # MANY TO MANY
+        subjects_selected = request.POST.getlist("student_class")
+        student.student_class.set(subjects_selected)
+        useroo=request.user
+        teacher = Teacher.objects.get(user=request.user)
+        messages.success(request, 'student added!')
+        return redirect('students_teacher')
+
+    return render(request, 'students/add-student.html', {
+    "subjects": subjects
+})
+
  
 def departmentsve(request):
   student = Student.objects.get(user=request.user)

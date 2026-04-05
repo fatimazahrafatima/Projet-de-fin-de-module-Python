@@ -6,7 +6,7 @@ from subject.models import Subject
 from holiday.models import Holiday
 from department.models import Department
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime,timedelta
 import calendar
 
 def dashboard(request):
@@ -51,7 +51,6 @@ def dashboard(request):
             'exam': exam
         })
 
-    # Split days into weeks (lists of 7)
     weeks = [days[i:i+7] for i in range(0, len(days), 7)]
     context = {
         'students':  students,
@@ -160,13 +159,49 @@ def holidays_teacher(request):
     })
 
 def add_exam(request):
+    subjects = Subject.objects.all()
+
+    if request.method == "POST":
+        subject_id = request.POST.get("subject")
+        title = request.POST.get("title")
+        exam_type = request.POST.get("exam_type")
+        exam_date = request.POST.get("exam_date")
+        duration_str = request.POST.get("duration")
+        total_marks = request.POST.get("total_marks")
+
+        subject = Subject.objects.get(id=subject_id)
+
+
+        h, m, s = map(int, duration_str.split(":"))
+        duration_str = request.POST.get("duration")
+
+        try:
+          parts = duration_str.split(":")
+          parts = [int(p) for p in parts]
+
+          while len(parts) < 3:
+            parts.append(0)
+
+          h, m, s = parts
+          duration = timedelta(hours=h, minutes=m, seconds=s)
+  
+        except:
+         duration = timedelta(hours=1)
+
+        Exam.objects.create(
+            subject=subject,
+            title=title,
+            exam_type=exam_type,
+            exam_date=exam_date,
+            duration=duration,
+            total_marks=total_marks
+        )
+
+        return redirect('exams_teacher') 
     user=request.user
     teacher = Teacher.objects.get(user=request.user)
-    holidays= Holiday.objects.all()
-
-    return render(request, 'teachers/courses_teacher.html', {
-        'holidays': holidays,
-        'Teacher':  teacher,
+    return render(request, 'exams/add_exam.html', {
+        "subjects": subjects
     })
 def edit_exam(request):
     user=request.user
@@ -178,6 +213,31 @@ def edit_exam(request):
         'Teacher':  teacher,
     })
 def delete_exam(request,id):
-  Exam.objects.filter(id=id).delete()
+    Exam.objects.filter(id=id).delete()
+    return redirect('exams_teacher')
+def add_exam_results(request, id):
+    exam = get_object_or_404(Exam, id=id)
+    students = Student.objects.filter(
+        student_class=exam.subject
+    ).distinct()
 
-  return render('teachers/exams_teacher.html')
+    if request.method == "POST":
+        for student in students:
+            grade = request.POST.get(f"grade_{student.id}")
+            status = request.POST.get(f"status_{student.id}")
+
+            ExamResult.objects.update_or_create(
+                student=student,
+                exam=exam,
+                defaults={
+                    "grade": float(grade) if grade else None,
+                    "status": status
+                }
+            )
+
+        return redirect("exams_teacher") 
+
+    return render(request, 'exams/add_exam-result.html', {
+        "exam": exam,
+        "students": students
+    })
