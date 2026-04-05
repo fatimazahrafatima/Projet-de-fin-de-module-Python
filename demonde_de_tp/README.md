@@ -8,6 +8,8 @@ run "git clone https://github.com/fatimazahrafatima/Projet-de-fin-de-module-Pyth
 7 run "pip install -r requirements.txt"
 8 run"python manage.py runserver" wiel you are in Projet-de-fin-de-module
 9 go to http://127.0.0.1:8000/
+ 
+vidio link:  https://youtu.be/IxfdSRX90IA
 
 Test Accounts
 Admin
